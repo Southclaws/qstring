@@ -11,6 +11,11 @@ type TestStruct struct {
 	Name string `qstring:"name"`
 	Do   bool
 
+	// pointer fields
+	OptionalName *string `qstring:"opt_name"`
+	OptionalDo   *bool   `qstring:"opt_do"`
+	UnsetPtr     *int    `qstring:"unset"`
+
 	// int fields
 	Page  int `qstring:"page"`
 	ID    int8
@@ -65,6 +70,8 @@ func TestUnmarshall(t *testing.T) {
 	query := url.Values{
 		"name":      []string{"SomeName"},
 		"do":        []string{"true"},
+		"opt_name":  []string{"SomeName"},
+		"opt_do":    []string{"true"},
 		"page":      []string{"1"},
 		"id":        []string{"12"},
 		"small":     []string{"13"},
@@ -104,6 +111,18 @@ func TestUnmarshall(t *testing.T) {
 	err := Unmarshal(query, &ts)
 	if err != nil {
 		t.Fatal(err.Error())
+	}
+
+	if ts.OptionalName == nil {
+		t.Errorf("Expected opt_name to be set, got nil")
+	}
+
+	if ts.OptionalDo == nil {
+		t.Errorf("Expected opt_do to be set, got nil")
+	}
+
+	if ts.UnsetPtr != nil {
+		t.Errorf("Expected unset to be nil, got a value: %p -> %v", ts.UnsetPtr, ts.UnsetPtr)
 	}
 
 	if ts.Page != 1 {

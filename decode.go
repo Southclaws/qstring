@@ -109,6 +109,17 @@ func (d *decoder) coerce(query string, target reflect.Kind, field reflect.Value)
 	var err error
 	var c interface{}
 
+	for {
+		if field.Kind() != reflect.Ptr {
+			break
+		}
+		if field.IsNil() {
+			field.Set(reflect.New(field.Type().Elem()))
+		} else {
+			field = field.Elem()
+		}
+	}
+
 	switch target {
 	case reflect.String:
 		field.SetString(query)
